@@ -9,7 +9,7 @@ class Verdureira {
 */
 
 
-function filtrarEPaginar<T>(
+/*function filtrarEPaginar<T>(
   itens: T[],
   filtro: (item: T) => boolean,
   pagina: number,
@@ -25,3 +25,4 @@ function filtrarEPaginar<T>(
     total: itensFiltrados.length
   };
 }
+*/
