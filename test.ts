@@ -109,7 +109,7 @@ ngOnDestroy(): void {
 
 
 
-import { switchMap, map } from 'rxjs/operators';
+/*import { switchMap, map } from 'rxjs/operators';
 
 ngOnInit(): void {
   const pessoaId = 1;
@@ -125,4 +125,63 @@ ngOnInit(): void {
   });
 }
 
+/*
 
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  takeUntil,
+  finalize
+} from 'rxjs/operators';
+import { Subject } from 'rxjs';
+
+@Component({
+  selector: 'app-busca',
+  template: `
+    <input [formControl]="buscaControl" placeholder="Pesquisar..." />
+
+    <p *ngIf="loading">Carregando...</p>
+
+    <ul>
+      <li *ngFor="let item of resultados">
+        {{ item.nome }}
+      </li>
+    </ul>
+  `
+})
+export class BuscaComponent implements OnInit, OnDestroy {
+  buscaControl = new FormControl('');
+  resultados: any[] = [];
+  loading = false;
+
+  private destroy$ = new Subject<void>();
+
+  constructor(private readonly pessoaService: PessoaService) {}
+
+  ngOnInit(): void {
+    this.buscaControl.valueChanges.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(termo => {
+        this.loading = true;
+
+        return this.pessoaService.buscar(termo).pipe(
+          finalize(() => {
+            this.loading = false;
+          })
+        );
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe(resultado => {
+      this.resultados = resultado;
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}
